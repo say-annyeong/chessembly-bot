@@ -36,86 +36,14 @@ impl<'a> Board<'a> {
         let mut ret = Board {
             dp: HashMap::new(),
             board: [
-                [
-                    PieceSpan::Empty,
-                    PieceSpan::Empty,
-                    PieceSpan::Empty,
-                    PieceSpan::Empty,
-                    PieceSpan::Empty,
-                    PieceSpan::Empty,
-                    PieceSpan::Empty,
-                    PieceSpan::Empty,
-                ],
-                [
-                    PieceSpan::Empty,
-                    PieceSpan::Empty,
-                    PieceSpan::Empty,
-                    PieceSpan::Empty,
-                    PieceSpan::Empty,
-                    PieceSpan::Empty,
-                    PieceSpan::Empty,
-                    PieceSpan::Empty,
-                ],
-                [
-                    PieceSpan::Empty,
-                    PieceSpan::Empty,
-                    PieceSpan::Empty,
-                    PieceSpan::Empty,
-                    PieceSpan::Empty,
-                    PieceSpan::Empty,
-                    PieceSpan::Empty,
-                    PieceSpan::Empty,
-                ],
-                [
-                    PieceSpan::Empty,
-                    PieceSpan::Empty,
-                    PieceSpan::Empty,
-                    PieceSpan::Empty,
-                    PieceSpan::Empty,
-                    PieceSpan::Empty,
-                    PieceSpan::Empty,
-                    PieceSpan::Empty,
-                ],
-                [
-                    PieceSpan::Empty,
-                    PieceSpan::Empty,
-                    PieceSpan::Empty,
-                    PieceSpan::Empty,
-                    PieceSpan::Empty,
-                    PieceSpan::Empty,
-                    PieceSpan::Empty,
-                    PieceSpan::Empty,
-                ],
-                [
-                    PieceSpan::Empty,
-                    PieceSpan::Empty,
-                    PieceSpan::Empty,
-                    PieceSpan::Empty,
-                    PieceSpan::Empty,
-                    PieceSpan::Empty,
-                    PieceSpan::Empty,
-                    PieceSpan::Empty,
-                ],
-                [
-                    PieceSpan::Empty,
-                    PieceSpan::Empty,
-                    PieceSpan::Empty,
-                    PieceSpan::Empty,
-                    PieceSpan::Empty,
-                    PieceSpan::Empty,
-                    PieceSpan::Empty,
-                    PieceSpan::Empty,
-                ],
-                [
-                    PieceSpan::Empty,
-                    PieceSpan::Empty,
-                    PieceSpan::Empty,
-                    PieceSpan::Empty,
-                    PieceSpan::Empty,
-                    PieceSpan::Empty,
-                    PieceSpan::Empty,
-                    PieceSpan::Empty,
-                ],
+                [PieceSpan::Empty, PieceSpan::Empty, PieceSpan::Empty, PieceSpan::Empty, PieceSpan::Empty, PieceSpan::Empty, PieceSpan::Empty, PieceSpan::Empty],
+                [PieceSpan::Empty, PieceSpan::Empty, PieceSpan::Empty, PieceSpan::Empty, PieceSpan::Empty, PieceSpan::Empty, PieceSpan::Empty, PieceSpan::Empty],
+                [PieceSpan::Empty, PieceSpan::Empty, PieceSpan::Empty, PieceSpan::Empty, PieceSpan::Empty, PieceSpan::Empty, PieceSpan::Empty, PieceSpan::Empty],
+                [PieceSpan::Empty, PieceSpan::Empty, PieceSpan::Empty, PieceSpan::Empty, PieceSpan::Empty, PieceSpan::Empty, PieceSpan::Empty, PieceSpan::Empty],
+                [PieceSpan::Empty, PieceSpan::Empty, PieceSpan::Empty, PieceSpan::Empty, PieceSpan::Empty, PieceSpan::Empty, PieceSpan::Empty, PieceSpan::Empty],
+                [PieceSpan::Empty, PieceSpan::Empty, PieceSpan::Empty, PieceSpan::Empty, PieceSpan::Empty, PieceSpan::Empty, PieceSpan::Empty, PieceSpan::Empty],
+                [PieceSpan::Empty, PieceSpan::Empty, PieceSpan::Empty, PieceSpan::Empty, PieceSpan::Empty, PieceSpan::Empty, PieceSpan::Empty, PieceSpan::Empty],
+                [PieceSpan::Empty, PieceSpan::Empty, PieceSpan::Empty, PieceSpan::Empty, PieceSpan::Empty, PieceSpan::Empty, PieceSpan::Empty, PieceSpan::Empty],
             ],
             board_state: BothBoardState {
                 black: BoardState {
@@ -137,67 +65,32 @@ impl<'a> Board<'a> {
         };
         for i in 0..8 {
             for j in 0..8 {
-                if placement.chars().nth((i * 9 + j) as usize) == Some('Q') {
-                    ret.board[i][j] = PieceSpan::Piece(Piece {
-                        piece_type: "queen",
-                        color: Color::White,
-                    })
-                } else if placement.chars().nth((i * 9 + j) as usize) == Some('N') {
-                    ret.board[i][j] = PieceSpan::Piece(Piece {
-                        piece_type: "knight",
-                        color: Color::White,
-                    })
-                } else if placement.chars().nth((i * 9 + j) as usize) == Some('K') {
-                    ret.board[i][j] = PieceSpan::Piece(Piece {
-                        piece_type: "king",
-                        color: Color::White,
-                    })
-                } else if placement.chars().nth((i * 9 + j) as usize) == Some('B') {
-                    ret.board[i][j] = PieceSpan::Piece(Piece {
-                        piece_type: "bishop",
-                        color: Color::White,
-                    })
-                } else if placement.chars().nth((i * 9 + j) as usize) == Some('R') {
-                    ret.board[i][j] = PieceSpan::Piece(Piece {
-                        piece_type: "rook",
-                        color: Color::White,
-                    })
-                } else if placement.chars().nth((i * 9 + j) as usize) == Some('P') {
-                    ret.board[i][j] = PieceSpan::Piece(Piece {
-                        piece_type: "pawn",
-                        color: Color::White,
-                    })
-                } else if placement.chars().nth((i * 9 + j) as usize) == Some('q') {
-                    ret.board[i][j] = PieceSpan::Piece(Piece {
-                        piece_type: "queen",
-                        color: Color::Black,
-                    })
-                } else if placement.chars().nth((i * 9 + j) as usize) == Some('n') {
-                    ret.board[i][j] = PieceSpan::Piece(Piece {
-                        piece_type: "knight",
-                        color: Color::Black,
-                    })
-                } else if placement.chars().nth((i * 9 + j) as usize) == Some('k') {
-                    ret.board[i][j] = PieceSpan::Piece(Piece {
-                        piece_type: "king",
-                        color: Color::Black,
-                    })
-                } else if placement.chars().nth((i * 9 + j) as usize) == Some('b') {
-                    ret.board[i][j] = PieceSpan::Piece(Piece {
-                        piece_type: "bishop",
-                        color: Color::Black,
-                    })
-                } else if placement.chars().nth((i * 9 + j) as usize) == Some('r') {
-                    ret.board[i][j] = PieceSpan::Piece(Piece {
-                        piece_type: "rook",
-                        color: Color::Black,
-                    })
-                } else if placement.chars().nth((i * 9 + j) as usize) == Some('p') {
-                    ret.board[i][j] = PieceSpan::Piece(Piece {
-                        piece_type: "pawn",
-                        color: Color::Black,
-                    })
-                }
+                let Some(char) = placement.chars().nth(i * 9 + j) else {
+                    continue;
+                };
+
+                let piece = match char {
+                    'Q' => ("queen", Color::White),
+                    'N' => ("knight", Color::White),
+                    'K' => ("king", Color::White),
+                    'B' => ("bishop", Color::White),
+                    'R' => ("rook", Color::White),
+                    'P' => ("pawn", Color::White),
+
+                    'q' => ("queen", Color::Black),
+                    'n' => ("knight", Color::Black),
+                    'k' => ("king", Color::Black),
+                    'b' => ("bishop", Color::Black),
+                    'r' => ("rook", Color::Black),
+                    'p' => ("pawn", Color::Black),
+
+                    _ => continue,
+                };
+
+                ret.board[i][j] = PieceSpan::Piece(Piece {
+                    piece_type: piece.0,
+                    color: piece.1,
+                });
             }
         }
         ret
@@ -207,86 +100,14 @@ impl<'a> Board<'a> {
         Board {
             dp: HashMap::new(),
             board: [
-                [
-                    PieceSpan::Empty,
-                    PieceSpan::Empty,
-                    PieceSpan::Empty,
-                    PieceSpan::Empty,
-                    PieceSpan::Empty,
-                    PieceSpan::Empty,
-                    PieceSpan::Empty,
-                    PieceSpan::Empty,
-                ],
-                [
-                    PieceSpan::Empty,
-                    PieceSpan::Empty,
-                    PieceSpan::Empty,
-                    PieceSpan::Empty,
-                    PieceSpan::Empty,
-                    PieceSpan::Empty,
-                    PieceSpan::Empty,
-                    PieceSpan::Empty,
-                ],
-                [
-                    PieceSpan::Empty,
-                    PieceSpan::Empty,
-                    PieceSpan::Empty,
-                    PieceSpan::Empty,
-                    PieceSpan::Empty,
-                    PieceSpan::Empty,
-                    PieceSpan::Empty,
-                    PieceSpan::Empty,
-                ],
-                [
-                    PieceSpan::Empty,
-                    PieceSpan::Empty,
-                    PieceSpan::Empty,
-                    PieceSpan::Empty,
-                    PieceSpan::Empty,
-                    PieceSpan::Empty,
-                    PieceSpan::Empty,
-                    PieceSpan::Empty,
-                ],
-                [
-                    PieceSpan::Empty,
-                    PieceSpan::Empty,
-                    PieceSpan::Empty,
-                    PieceSpan::Empty,
-                    PieceSpan::Empty,
-                    PieceSpan::Empty,
-                    PieceSpan::Empty,
-                    PieceSpan::Empty,
-                ],
-                [
-                    PieceSpan::Empty,
-                    PieceSpan::Empty,
-                    PieceSpan::Empty,
-                    PieceSpan::Empty,
-                    PieceSpan::Empty,
-                    PieceSpan::Empty,
-                    PieceSpan::Empty,
-                    PieceSpan::Empty,
-                ],
-                [
-                    PieceSpan::Empty,
-                    PieceSpan::Empty,
-                    PieceSpan::Empty,
-                    PieceSpan::Empty,
-                    PieceSpan::Empty,
-                    PieceSpan::Empty,
-                    PieceSpan::Empty,
-                    PieceSpan::Empty,
-                ],
-                [
-                    PieceSpan::Empty,
-                    PieceSpan::Empty,
-                    PieceSpan::Empty,
-                    PieceSpan::Empty,
-                    PieceSpan::Empty,
-                    PieceSpan::Empty,
-                    PieceSpan::Empty,
-                    PieceSpan::Empty,
-                ],
+                [PieceSpan::Empty, PieceSpan::Empty, PieceSpan::Empty, PieceSpan::Empty, PieceSpan::Empty, PieceSpan::Empty, PieceSpan::Empty, PieceSpan::Empty],
+                [PieceSpan::Empty, PieceSpan::Empty, PieceSpan::Empty, PieceSpan::Empty, PieceSpan::Empty, PieceSpan::Empty, PieceSpan::Empty, PieceSpan::Empty],
+                [PieceSpan::Empty, PieceSpan::Empty, PieceSpan::Empty, PieceSpan::Empty, PieceSpan::Empty, PieceSpan::Empty, PieceSpan::Empty, PieceSpan::Empty],
+                [PieceSpan::Empty, PieceSpan::Empty, PieceSpan::Empty, PieceSpan::Empty, PieceSpan::Empty, PieceSpan::Empty, PieceSpan::Empty, PieceSpan::Empty],
+                [PieceSpan::Empty, PieceSpan::Empty, PieceSpan::Empty, PieceSpan::Empty, PieceSpan::Empty, PieceSpan::Empty, PieceSpan::Empty, PieceSpan::Empty],
+                [PieceSpan::Empty, PieceSpan::Empty, PieceSpan::Empty, PieceSpan::Empty, PieceSpan::Empty, PieceSpan::Empty, PieceSpan::Empty, PieceSpan::Empty],
+                [PieceSpan::Empty, PieceSpan::Empty, PieceSpan::Empty, PieceSpan::Empty, PieceSpan::Empty, PieceSpan::Empty, PieceSpan::Empty, PieceSpan::Empty],
+                [PieceSpan::Empty, PieceSpan::Empty, PieceSpan::Empty, PieceSpan::Empty, PieceSpan::Empty, PieceSpan::Empty, PieceSpan::Empty, PieceSpan::Empty],
             ],
             board_state: BothBoardState {
                 black: BoardState {
@@ -302,7 +123,7 @@ impl<'a> Board<'a> {
                     register: HashMap::new(),
                 },
             },
-            script: script,
+            script,
             turn: Color::White,
             status: BoardStatus::Ongoing,
         }
@@ -313,180 +134,48 @@ impl<'a> Board<'a> {
             dp: HashMap::new(),
             board: [
                 [
-                    PieceSpan::Piece(Piece {
-                        color: Color::Black,
-                        piece_type: "rook",
-                    }),
-                    PieceSpan::Piece(Piece {
-                        color: Color::Black,
-                        piece_type: "knight",
-                    }),
-                    PieceSpan::Piece(Piece {
-                        color: Color::Black,
-                        piece_type: "bishop",
-                    }),
-                    PieceSpan::Piece(Piece {
-                        color: Color::Black,
-                        piece_type: "queen",
-                    }),
-                    PieceSpan::Piece(Piece {
-                        color: Color::Black,
-                        piece_type: "king",
-                    }),
-                    PieceSpan::Piece(Piece {
-                        color: Color::Black,
-                        piece_type: "bishop",
-                    }),
-                    PieceSpan::Piece(Piece {
-                        color: Color::Black,
-                        piece_type: "knight",
-                    }),
-                    PieceSpan::Piece(Piece {
-                        color: Color::Black,
-                        piece_type: "rook",
-                    }),
+                    PieceSpan::Piece(Piece { color: Color::Black, piece_type: "rook" }),
+                    PieceSpan::Piece(Piece { color: Color::Black, piece_type: "knight" }),
+                    PieceSpan::Piece(Piece { color: Color::Black, piece_type: "bishop" }),
+                    PieceSpan::Piece(Piece { color: Color::Black, piece_type: "queen" }),
+                    PieceSpan::Piece(Piece { color: Color::Black, piece_type: "king" }),
+                    PieceSpan::Piece(Piece { color: Color::Black, piece_type: "bishop" }),
+                    PieceSpan::Piece(Piece { color: Color::Black, piece_type: "knight" }),
+                    PieceSpan::Piece(Piece { color: Color::Black, piece_type: "rook" }),
                 ],
                 [
-                    PieceSpan::Piece(Piece {
-                        color: Color::Black,
-                        piece_type: "pawn",
-                    }),
-                    PieceSpan::Piece(Piece {
-                        color: Color::Black,
-                        piece_type: "pawn",
-                    }),
-                    PieceSpan::Piece(Piece {
-                        color: Color::Black,
-                        piece_type: "pawn",
-                    }),
-                    PieceSpan::Piece(Piece {
-                        color: Color::Black,
-                        piece_type: "pawn",
-                    }),
-                    PieceSpan::Piece(Piece {
-                        color: Color::Black,
-                        piece_type: "pawn",
-                    }),
-                    PieceSpan::Piece(Piece {
-                        color: Color::Black,
-                        piece_type: "pawn",
-                    }),
-                    PieceSpan::Piece(Piece {
-                        color: Color::Black,
-                        piece_type: "pawn",
-                    }),
-                    PieceSpan::Piece(Piece {
-                        color: Color::Black,
-                        piece_type: "pawn",
-                    }),
+                    PieceSpan::Piece(Piece { color: Color::Black, piece_type: "pawn" }),
+                    PieceSpan::Piece(Piece { color: Color::Black, piece_type: "pawn" }),
+                    PieceSpan::Piece(Piece { color: Color::Black, piece_type: "pawn" }),
+                    PieceSpan::Piece(Piece { color: Color::Black, piece_type: "pawn" }),
+                    PieceSpan::Piece(Piece { color: Color::Black, piece_type: "pawn" }),
+                    PieceSpan::Piece(Piece { color: Color::Black, piece_type: "pawn" }),
+                    PieceSpan::Piece(Piece { color: Color::Black, piece_type: "pawn" }),
+                    PieceSpan::Piece(Piece { color: Color::Black, piece_type: "pawn" }),
+                ],
+                [PieceSpan::Empty, PieceSpan::Empty, PieceSpan::Empty, PieceSpan::Empty, PieceSpan::Empty, PieceSpan::Empty, PieceSpan::Empty, PieceSpan::Empty],
+                [PieceSpan::Empty, PieceSpan::Empty, PieceSpan::Empty, PieceSpan::Empty, PieceSpan::Empty, PieceSpan::Empty, PieceSpan::Empty, PieceSpan::Empty],
+                [PieceSpan::Empty, PieceSpan::Empty, PieceSpan::Empty, PieceSpan::Empty, PieceSpan::Empty, PieceSpan::Empty, PieceSpan::Empty, PieceSpan::Empty],
+                [PieceSpan::Empty, PieceSpan::Empty, PieceSpan::Empty, PieceSpan::Empty, PieceSpan::Empty, PieceSpan::Empty, PieceSpan::Empty, PieceSpan::Empty],
+                [
+                    PieceSpan::Piece(Piece { color: Color::White, piece_type: "pawn" }),
+                    PieceSpan::Piece(Piece { color: Color::White, piece_type: "pawn" }),
+                    PieceSpan::Piece(Piece { color: Color::White, piece_type: "pawn" }),
+                    PieceSpan::Piece(Piece { color: Color::White, piece_type: "pawn" }),
+                    PieceSpan::Piece(Piece { color: Color::White, piece_type: "pawn" }),
+                    PieceSpan::Piece(Piece { color: Color::White, piece_type: "pawn" }),
+                    PieceSpan::Piece(Piece { color: Color::White, piece_type: "pawn" }),
+                    PieceSpan::Piece(Piece { color: Color::White, piece_type: "pawn" }),
                 ],
                 [
-                    PieceSpan::Empty,
-                    PieceSpan::Empty,
-                    PieceSpan::Empty,
-                    PieceSpan::Empty,
-                    PieceSpan::Empty,
-                    PieceSpan::Empty,
-                    PieceSpan::Empty,
-                    PieceSpan::Empty,
-                ],
-                [
-                    PieceSpan::Empty,
-                    PieceSpan::Empty,
-                    PieceSpan::Empty,
-                    PieceSpan::Empty,
-                    PieceSpan::Empty,
-                    PieceSpan::Empty,
-                    PieceSpan::Empty,
-                    PieceSpan::Empty,
-                ],
-                [
-                    PieceSpan::Empty,
-                    PieceSpan::Empty,
-                    PieceSpan::Empty,
-                    PieceSpan::Empty,
-                    PieceSpan::Empty,
-                    PieceSpan::Empty,
-                    PieceSpan::Empty,
-                    PieceSpan::Empty,
-                ],
-                [
-                    PieceSpan::Empty,
-                    PieceSpan::Empty,
-                    PieceSpan::Empty,
-                    PieceSpan::Empty,
-                    PieceSpan::Empty,
-                    PieceSpan::Empty,
-                    PieceSpan::Empty,
-                    PieceSpan::Empty,
-                ],
-                [
-                    PieceSpan::Piece(Piece {
-                        color: Color::White,
-                        piece_type: "pawn",
-                    }),
-                    PieceSpan::Piece(Piece {
-                        color: Color::White,
-                        piece_type: "pawn",
-                    }),
-                    PieceSpan::Piece(Piece {
-                        color: Color::White,
-                        piece_type: "pawn",
-                    }),
-                    PieceSpan::Piece(Piece {
-                        color: Color::White,
-                        piece_type: "pawn",
-                    }),
-                    PieceSpan::Piece(Piece {
-                        color: Color::White,
-                        piece_type: "pawn",
-                    }),
-                    PieceSpan::Piece(Piece {
-                        color: Color::White,
-                        piece_type: "pawn",
-                    }),
-                    PieceSpan::Piece(Piece {
-                        color: Color::White,
-                        piece_type: "pawn",
-                    }),
-                    PieceSpan::Piece(Piece {
-                        color: Color::White,
-                        piece_type: "pawn",
-                    }),
-                ],
-                [
-                    PieceSpan::Piece(Piece {
-                        color: Color::White,
-                        piece_type: "rook",
-                    }),
-                    PieceSpan::Piece(Piece {
-                        color: Color::White,
-                        piece_type: "knight",
-                    }),
-                    PieceSpan::Piece(Piece {
-                        color: Color::White,
-                        piece_type: "bishop",
-                    }),
-                    PieceSpan::Piece(Piece {
-                        color: Color::White,
-                        piece_type: "queen",
-                    }),
-                    PieceSpan::Piece(Piece {
-                        color: Color::White,
-                        piece_type: "king",
-                    }),
-                    PieceSpan::Piece(Piece {
-                        color: Color::White,
-                        piece_type: "bishop",
-                    }),
-                    PieceSpan::Piece(Piece {
-                        color: Color::White,
-                        piece_type: "knight",
-                    }),
-                    PieceSpan::Piece(Piece {
-                        color: Color::White,
-                        piece_type: "rook",
-                    }),
+                    PieceSpan::Piece(Piece { color: Color::White, piece_type: "rook" }),
+                    PieceSpan::Piece(Piece { color: Color::White, piece_type: "knight" }),
+                    PieceSpan::Piece(Piece { color: Color::White, piece_type: "bishop" }),
+                    PieceSpan::Piece(Piece { color: Color::White, piece_type: "queen" }),
+                    PieceSpan::Piece(Piece { color: Color::White, piece_type: "king" }),
+                    PieceSpan::Piece(Piece { color: Color::White, piece_type: "bishop" }),
+                    PieceSpan::Piece(Piece { color: Color::White, piece_type: "knight" }),
+                    PieceSpan::Piece(Piece { color: Color::White, piece_type: "rook" }),
                 ],
             ],
             board_state: BothBoardState {
@@ -503,7 +192,7 @@ impl<'a> Board<'a> {
                     register: HashMap::new(),
                 },
             },
-            script: script,
+            script,
             turn: Color::White,
             status: BoardStatus::Ongoing,
         }
@@ -513,49 +202,34 @@ impl<'a> Board<'a> {
         let mut ret = String::new();
         for j in 0..8 {
             for i in 0..8 {
-                if let Some(color) = self.color_on(&(i, j)) {
-                    if self.piece_on(&(i, j)).unwrap() == "pawn" {
-                        if color == Color::Black {
-                            ret.push('p');
-                        } else if color == Color::White {
-                            ret.push('P');
-                        }
-                    } else if self.piece_on(&(i, j)).unwrap() == "rook" {
-                        if color == Color::Black {
-                            ret.push('r');
-                        } else if color == Color::White {
-                            ret.push('R');
-                        }
-                    } else if self.piece_on(&(i, j)).unwrap() == "bishop" {
-                        if color == Color::Black {
-                            ret.push('b');
-                        } else if color == Color::White {
-                            ret.push('B');
-                        }
-                    } else if self.piece_on(&(i, j)).unwrap() == "knight" {
-                        if color == Color::Black {
-                            ret.push('n');
-                        } else if color == Color::White {
-                            ret.push('N');
-                        }
-                    } else if self.piece_on(&(i, j)).unwrap() == "king" {
-                        if color == Color::Black {
-                            ret.push('k');
-                        } else if color == Color::White {
-                            ret.push('K');
-                        }
-                    } else if self.piece_on(&(i, j)).unwrap() == "queen" {
-                        if color == Color::Black {
-                            ret.push('q');
-                        } else if color == Color::White {
-                            ret.push('Q');
-                        }
-                    } else if let Some(piece) = self.piece_on(&(i, j)) {
-                        ret.push(piece.chars().next().unwrap());
-                    }
-                } else {
+                let Some(color) = self.color_on(&[i, j].into()) else {
                     ret.push(' ');
-                }
+                    continue;
+                };
+                let piece = self.piece_on(&(i, j)).unwrap();
+
+                let ch = match (piece, color) {
+                    ("pawn", Color::Black) => 'p',
+                    ("pawn", Color::White) => 'P',
+                    ("rook", Color::Black) => 'r',
+                    ("rook", Color::White) => 'R',
+                    ("bishop", Color::Black) => 'b',
+                    ("bishop", Color::White) => 'B',
+                    ("knight", Color::Black) => 'n',
+                    ("knight", Color::White) => 'N',
+                    ("king", Color::Black) => 'k',
+                    ("king", Color::White) => 'K',
+                    ("queen", Color::Black) => 'q',
+                    ("queen", Color::White) => 'Q',
+                    _ => {
+                        if let Some(piece) = self.piece_on(&(i, j)) {
+                            piece.chars().next().unwrap()
+                        } else {
+                            continue;
+                        }
+                    }
+                };
+                ret.push(ch);
             }
             ret.push('\n');
         }
@@ -627,12 +301,12 @@ impl<'a> Board<'a> {
     }
 
     #[inline]
-    pub fn status(&self) -> BoardStatus {
+    pub const fn status(&self) -> BoardStatus {
         self.status
     }
 
     #[inline]
-    pub fn piece_on(&self, position: &Position) -> Option<&str> {
+    pub const fn piece_on(&self, position: &Position) -> Option<&str> {
         if position.0 > 7 || position.1 > 7 {
             return None;
         } else if let PieceSpan::Piece(piece) =
@@ -644,7 +318,7 @@ impl<'a> Board<'a> {
     }
 
     #[inline]
-    pub fn color_on(&self, position: &Position) -> Option<Color> {
+    pub const fn color_on(&self, position: &Position) -> Option<Color> {
         if position.0 > 7 || position.1 > 7 {
             return None;
         } else if let PieceSpan::Piece(piece) =
@@ -656,17 +330,17 @@ impl<'a> Board<'a> {
     }
 
     #[inline]
-    pub fn side_to_move(&self) -> Color {
+    pub const fn side_to_move(&self) -> Color {
         self.turn
     }
 
     #[inline]
-    pub fn get_width(&self) -> usize {
+    pub const fn get_width(&self) -> usize {
         8
     }
 
     #[inline]
-    pub fn get_height(&self) -> usize {
+    pub const fn get_height(&self) -> usize {
         8
     }
 }

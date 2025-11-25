@@ -111,11 +111,7 @@ enum WallCollision {
 pub struct MoveGen {}
 
 impl MoveGen {
-    pub fn get_all_moves<'a>(
-        board: &mut Board<'a>,
-        turn: Color,
-        check_danger: bool,
-    ) -> Vec<ChessMove<'a>> {
+    pub fn get_all_moves<'a>(board: &mut Board<'a>, turn: Color, check_danger: bool) -> Vec<ChessMove<'a>> {
         let mut ret = Vec::new();
         for j in 0..board.get_height() {
             for i in 0..board.get_width() {
