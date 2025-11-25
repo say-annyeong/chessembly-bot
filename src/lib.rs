@@ -71,7 +71,6 @@ async fn fetch(req: HttpRequest, _env: Env, _ctx: Context) -> Result<worker::Res
             String::from("null").into_bytes(),
         ))?);
     }
-
     // println!("{:?}", req.body());
     Ok(Response::from_body(ResponseBody::Body(
         "asdf".as_bytes().to_vec(),
@@ -80,4 +79,5 @@ async fn fetch(req: HttpRequest, _env: Env, _ctx: Context) -> Result<worker::Res
 
 pub async fn root() -> &'static str {
     "Hello Axum!"
+
 }
