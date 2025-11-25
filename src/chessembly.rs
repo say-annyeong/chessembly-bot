@@ -1,4 +1,6 @@
 use std::{collections::HashMap, hash::Hash};
+use std::cmp::Ordering;
+
 mod moves;
 
 #[derive(Copy, Clone, PartialEq, PartialOrd, Debug, Eq)]
@@ -21,16 +23,16 @@ pub enum GameResult {
 
 #[derive(PartialEq, Eq, Clone, Debug)]
 pub struct BoardState<'a> {
-    pub castling_oo :bool,
-    pub castling_ooo :bool,
-    pub enpassant :Vec<Position>,
-    pub register :HashMap<&'a str, u8>
+    pub castling_oo: bool,
+    pub castling_ooo: bool,
+    pub enpassant: Vec<Position>,
+    pub register: HashMap<&'a str, u8>
 }
 
 #[derive(PartialEq, Eq, Clone, Debug)]
 pub struct BothBoardState<'a> {
-    pub black :BoardState<'a>,
-    pub white :BoardState<'a>
+    pub black: BoardState<'a>,
+    pub white: BoardState<'a>
 }
 
 #[derive(PartialOrd, PartialEq, Eq, Copy, Clone, Debug, Hash)]
@@ -465,12 +467,12 @@ impl<'a> Board<'a> {
     }
 
     #[inline]
-    pub fn status(&self) -> BoardStatus {
+    pub const fn status(&self) -> BoardStatus {
         self.status
     }
 
     #[inline]
-    pub fn piece_on(&self, position :&Position) -> Option<&str> {
+    pub const fn piece_on(&self, position :&Position) -> Option<&str> {
         if position.0 > 7 || position.1 > 7 {
             return None;
         }
@@ -481,7 +483,7 @@ impl<'a> Board<'a> {
     }
 
     #[inline]
-    pub fn color_on(&self, position :&Position) -> Option<Color> {
+    pub const fn color_on(&self, position :&Position) -> Option<Color> {
         if position.0 > 7 || position.1 > 7 {
             return None;
         }
@@ -492,47 +494,43 @@ impl<'a> Board<'a> {
     }
     
     #[inline]
-    pub fn side_to_move(&self) -> Color {
+    pub const fn side_to_move(&self) -> Color {
         self.turn
     }
     
     #[inline]
-    pub fn get_width(&self) -> usize {
+    pub const fn get_width(&self) -> usize {
         8
     }
 
     #[inline]
-    pub fn get_height(&self) -> usize {
+    pub const fn get_height(&self) -> usize {
         8
     }
 }
 
 impl<'a> Behavior<'a> {
+    const STARTS_WITH_TABLE: [(&'static str, Behavior<'static>); 7] = [
+        ("end", Behavior::End),
+        ("while", Behavior::While),
+        ("do", Behavior::Do),
+        ("not", Behavior::Not),
+        ("check", Behavior::Check),
+        ("}", Behavior::BlockClose),
+        ("{", Behavior::BlockOpen)
+    ];
+
     pub fn from_str(fragment :&'a str) -> Behavior<'a> {
-        if fragment.starts_with("end") {
-            return Behavior::End;
+        for (prefix, behaver) in Behavior::STARTS_WITH_TABLE {
+            if fragment.starts_with(prefix) {
+                return behaver;
+            }
         }
-        else if fragment.starts_with("while") {
-            return Behavior::While;
-        }
-        else if fragment.starts_with("do") {
-            return Behavior::Do;
-        }
-        else if fragment.starts_with("not") {
-            return Behavior::Not;
-        }
-        else if fragment.starts_with("check") {
-            return Behavior::Check;
-        }
-        else if fragment == "transition" {
+
+        if fragment == "transition" {
             return Behavior::Transition("");
         }
-        else if fragment.starts_with("}") {
-            return Behavior::BlockClose;
-        }
-        else if fragment.starts_with("{") {
-            return Behavior::BlockOpen;
-        }
+
         let fs1 = fragment.split_once('(');
         if fs1.is_none() {
             // worker::console_log!("??????");
@@ -547,107 +545,49 @@ impl<'a> Behavior<'a> {
         let (params, _) = fs2.unwrap();
         let params_vec :Vec<&str> = params.split(',').map(|x| x.trim()).collect();
 
-        if cmd == "label" {
-            return Behavior::Label(params_vec.get(0).map(|s| s.parse::<u8>().unwrap_or(0)).unwrap_or(0));
-        }
-        else if cmd == "jmp" {
-            return Behavior::Jmp(params_vec.get(0).map(|s| s.parse::<u8>().unwrap_or(0)).unwrap_or(0));
-        }
-        else if cmd == "jne" {
-            return Behavior::Jne(params_vec.get(0).map(|s| s.parse::<u8>().unwrap_or(0)).unwrap_or(0));
-        }
-        else if cmd == "repeat" {
-            return Behavior::Repeat(params_vec.get(0).map(|s| s.parse::<i8>().unwrap_or(0)).unwrap_or(0));
-        }
-        else if cmd == "transition" {
-            return Behavior::Transition(params_vec.get(0).unwrap_or(&""));
-        }
-        else if cmd == "piece" {
-            return Behavior::Piece(params_vec.get(0).map(|s| String::from(*s)).unwrap_or(String::new()));
-        }
-        else if cmd == "set-state" {
-            return Behavior::SetState((params_vec.get(0).unwrap_or(&""), params_vec.get(1).map(|s| s.parse::<u8>().unwrap_or(0)).unwrap_or(0)));
-        }
-        else if cmd == "if-state" {
-            return Behavior::IfState((params_vec.get(0).unwrap_or(&""), params_vec.get(1).map(|s| s.parse::<u8>().unwrap_or(0)).unwrap_or(0)));
-        }
-        else if cmd == "piece-on" {
-            return Behavior::PieceOn((params_vec.get(0).unwrap_or(&""), (
+        match cmd {
+            "label" => Behavior::Label(params_vec.get(0).map(|s| s.parse::<u8>().unwrap_or(0)).unwrap_or(0)),
+            "jmp" => Behavior::Jmp(params_vec.get(0).map(|s| s.parse::<u8>().unwrap_or(0)).unwrap_or(0)),
+            "jne" => Behavior::Jne(params_vec.get(0).map(|s| s.parse::<u8>().unwrap_or(0)).unwrap_or(0)),
+            "repeat" => Behavior::Repeat(params_vec.get(0).map(|s| s.parse::<i8>().unwrap_or(0)).unwrap_or(0)),
+            "transition" => Behavior::Transition(params_vec.get(0).unwrap_or(&"")),
+            "piece" => Behavior::Piece(params_vec.get(0).map(|s| String::from(*s)).unwrap_or(String::new())),
+            "set-state" => Behavior::SetState((params_vec.get(0).unwrap_or(&""), params_vec.get(1).map(|s| s.parse::<u8>().unwrap_or(0)).unwrap_or(0))),
+            "if-state" => Behavior::IfState((params_vec.get(0).unwrap_or(&""), params_vec.get(1).map(|s| s.parse::<u8>().unwrap_or(0)).unwrap_or(0))),
+            "piece-on" => Behavior::PieceOn((params_vec.get(0).unwrap_or(&""), (
                 params_vec.get(1).map(|s| s.parse::<i8>().unwrap_or(0)).unwrap_or(0),
                 params_vec.get(2).map(|s| s.parse::<i8>().unwrap_or(0)).unwrap_or(0)
-            )));
+            ))),
+            "take-move" => Behavior::TakeMove((params_vec.get(0).map(|s| s.parse::<i8>().unwrap_or(0)).unwrap_or(0), params_vec.get(1).map(|s| s.parse::<i8>().unwrap_or(0)).unwrap_or(0))),
+            "take" => Behavior::Take((params_vec.get(0).map(|s| s.parse::<i8>().unwrap_or(0)).unwrap_or(0), params_vec.get(1).map(|s| s.parse::<i8>().unwrap_or(0)).unwrap_or(0))),
+            "move" => Behavior::Move((params_vec.get(0).map(|s| s.parse::<i8>().unwrap_or(0)).unwrap_or(0), params_vec.get(1).map(|s| s.parse::<i8>().unwrap_or(0)).unwrap_or(0))),
+            "catch" => Behavior::Catch((params_vec.get(0).map(|s| s.parse::<i8>().unwrap_or(0)).unwrap_or(0), params_vec.get(1).map(|s| s.parse::<i8>().unwrap_or(0)).unwrap_or(0))),
+            "danger" => Behavior::Danger((params_vec.get(0).map(|s| s.parse::<i8>().unwrap_or(0)).unwrap_or(0), params_vec.get(1).map(|s| s.parse::<i8>().unwrap_or(0)).unwrap_or(0))),
+            "enemy" => Behavior::Enemy((params_vec.get(0).map(|s| s.parse::<i8>().unwrap_or(0)).unwrap_or(0), params_vec.get(1).map(|s| s.parse::<i8>().unwrap_or(0)).unwrap_or(0))),
+            "friendly" => Behavior::Friendly((params_vec.get(0).map(|s| s.parse::<i8>().unwrap_or(0)).unwrap_or(0), params_vec.get(1).map(|s| s.parse::<i8>().unwrap_or(0)).unwrap_or(0))),
+            "peek" => Behavior::Peek((params_vec.get(0).map(|s| s.parse::<i8>().unwrap_or(0)).unwrap_or(0), params_vec.get(1).map(|s| s.parse::<i8>().unwrap_or(0)).unwrap_or(0))),
+            "observe" => Behavior::Observe((params_vec.get(0).map(|s| s.parse::<i8>().unwrap_or(0)).unwrap_or(0), params_vec.get(1).map(|s| s.parse::<i8>().unwrap_or(0)).unwrap_or(0))),
+            "bound" => Behavior::Bound((params_vec.get(0).map(|s| s.parse::<i8>().unwrap_or(0)).unwrap_or(0), params_vec.get(1).map(|s| s.parse::<i8>().unwrap_or(0)).unwrap_or(0))),
+            "edge" => Behavior::Edge((params_vec.get(0).map(|s| s.parse::<i8>().unwrap_or(0)).unwrap_or(0), params_vec.get(1).map(|s| s.parse::<i8>().unwrap_or(0)).unwrap_or(0))),
+            "corner" => Behavior::Corner((params_vec.get(0).map(|s| s.parse::<i8>().unwrap_or(0)).unwrap_or(0), params_vec.get(1).map(|s| s.parse::<i8>().unwrap_or(0)).unwrap_or(0))),
+            "edge-left" => Behavior::EdgeLeft((params_vec.get(0).map(|s| s.parse::<i8>().unwrap_or(0)).unwrap_or(0), params_vec.get(1).map(|s| s.parse::<i8>().unwrap_or(0)).unwrap_or(0))),
+            "edge-right" => Behavior::EdgeRight((params_vec.get(0).map(|s| s.parse::<i8>().unwrap_or(0)).unwrap_or(0), params_vec.get(1).map(|s| s.parse::<i8>().unwrap_or(0)).unwrap_or(0))),
+            "edge-top" => Behavior::EdgeTop((params_vec.get(0).map(|s| s.parse::<i8>().unwrap_or(0)).unwrap_or(0), params_vec.get(1).map(|s| s.parse::<i8>().unwrap_or(0)).unwrap_or(0))),
+            "edge-bottom" => Behavior::EdgeBottom((params_vec.get(0).map(|s| s.parse::<i8>().unwrap_or(0)).unwrap_or(0), params_vec.get(1).map(|s| s.parse::<i8>().unwrap_or(0)).unwrap_or(0))),
+            "corner-top-left" => Behavior::CornerTopLeft((params_vec.get(0).map(|s| s.parse::<i8>().unwrap_or(0)).unwrap_or(0), params_vec.get(1).map(|s| s.parse::<i8>().unwrap_or(0)).unwrap_or(0))),
+            "corner-top-right" => Behavior::CornerTopRight((params_vec.get(0).map(|s| s.parse::<i8>().unwrap_or(0)).unwrap_or(0), params_vec.get(1).map(|s| s.parse::<i8>().unwrap_or(0)).unwrap_or(0))),
+            "corner-bottom-left" => Behavior::CornerBottomLeft((params_vec.get(0).map(|s| s.parse::<i8>().unwrap_or(0)).unwrap_or(0), params_vec.get(1).map(|s| s.parse::<i8>().unwrap_or(0)).unwrap_or(0))),
+            "corner-bottom-right" => Behavior::CornerBottomRight((params_vec.get(0).map(|s| s.parse::<i8>().unwrap_or(0)).unwrap_or(0), params_vec.get(1).map(|s| s.parse::<i8>().unwrap_or(0)).unwrap_or(0))),
+            _ => Behavior::End
         }
-        else if cmd == "take-move" {
-            return Behavior::TakeMove((params_vec.get(0).map(|s| s.parse::<i8>().unwrap_or(0)).unwrap_or(0), params_vec.get(1).map(|s| s.parse::<i8>().unwrap_or(0)).unwrap_or(0)));
-        }
-        else if cmd == "take" {
-            return Behavior::Take((params_vec.get(0).map(|s| s.parse::<i8>().unwrap_or(0)).unwrap_or(0), params_vec.get(1).map(|s| s.parse::<i8>().unwrap_or(0)).unwrap_or(0)));
-        }
-        else if cmd == "move" {
-            return Behavior::Move((params_vec.get(0).map(|s| s.parse::<i8>().unwrap_or(0)).unwrap_or(0), params_vec.get(1).map(|s| s.parse::<i8>().unwrap_or(0)).unwrap_or(0)));
-        }
-        else if cmd == "catch" {
-            return Behavior::Catch((params_vec.get(0).map(|s| s.parse::<i8>().unwrap_or(0)).unwrap_or(0), params_vec.get(1).map(|s| s.parse::<i8>().unwrap_or(0)).unwrap_or(0)));
-        }
-        else if cmd == "danger" {
-            return Behavior::Danger((params_vec.get(0).map(|s| s.parse::<i8>().unwrap_or(0)).unwrap_or(0), params_vec.get(1).map(|s| s.parse::<i8>().unwrap_or(0)).unwrap_or(0)));
-        }
-        else if cmd == "enemy" {
-            return Behavior::Enemy((params_vec.get(0).map(|s| s.parse::<i8>().unwrap_or(0)).unwrap_or(0), params_vec.get(1).map(|s| s.parse::<i8>().unwrap_or(0)).unwrap_or(0)));
-        }
-        else if cmd == "friendly" {
-            return Behavior::Friendly((params_vec.get(0).map(|s| s.parse::<i8>().unwrap_or(0)).unwrap_or(0), params_vec.get(1).map(|s| s.parse::<i8>().unwrap_or(0)).unwrap_or(0)));
-        }
-        else if cmd == "peek" {
-            return Behavior::Peek((params_vec.get(0).map(|s| s.parse::<i8>().unwrap_or(0)).unwrap_or(0), params_vec.get(1).map(|s| s.parse::<i8>().unwrap_or(0)).unwrap_or(0)));
-        }
-        else if cmd == "observe" {
-            return Behavior::Observe((params_vec.get(0).map(|s| s.parse::<i8>().unwrap_or(0)).unwrap_or(0), params_vec.get(1).map(|s| s.parse::<i8>().unwrap_or(0)).unwrap_or(0)));
-        }
-        else if cmd == "bound" {
-            return Behavior::Bound((params_vec.get(0).map(|s| s.parse::<i8>().unwrap_or(0)).unwrap_or(0), params_vec.get(1).map(|s| s.parse::<i8>().unwrap_or(0)).unwrap_or(0)));
-        }
-        else if cmd == "edge" {
-            return Behavior::Edge((params_vec.get(0).map(|s| s.parse::<i8>().unwrap_or(0)).unwrap_or(0), params_vec.get(1).map(|s| s.parse::<i8>().unwrap_or(0)).unwrap_or(0)));
-        }
-        else if cmd == "corner" {
-            return Behavior::Corner((params_vec.get(0).map(|s| s.parse::<i8>().unwrap_or(0)).unwrap_or(0), params_vec.get(1).map(|s| s.parse::<i8>().unwrap_or(0)).unwrap_or(0)));
-        }
-        else if cmd == "edge-left" {
-            return Behavior::EdgeLeft((params_vec.get(0).map(|s| s.parse::<i8>().unwrap_or(0)).unwrap_or(0), params_vec.get(1).map(|s| s.parse::<i8>().unwrap_or(0)).unwrap_or(0)));
-        }
-        else if cmd == "edge-right" {
-            return Behavior::EdgeRight((params_vec.get(0).map(|s| s.parse::<i8>().unwrap_or(0)).unwrap_or(0), params_vec.get(1).map(|s| s.parse::<i8>().unwrap_or(0)).unwrap_or(0)));
-        }
-        else if cmd == "edge-top" {
-            return Behavior::EdgeTop((params_vec.get(0).map(|s| s.parse::<i8>().unwrap_or(0)).unwrap_or(0), params_vec.get(1).map(|s| s.parse::<i8>().unwrap_or(0)).unwrap_or(0)));
-        }
-        else if cmd == "edge-bottom" {
-            return Behavior::EdgeBottom((params_vec.get(0).map(|s| s.parse::<i8>().unwrap_or(0)).unwrap_or(0), params_vec.get(1).map(|s| s.parse::<i8>().unwrap_or(0)).unwrap_or(0)));
-        }
-        else if cmd == "corner-top-left" {
-            return Behavior::CornerTopLeft((params_vec.get(0).map(|s| s.parse::<i8>().unwrap_or(0)).unwrap_or(0), params_vec.get(1).map(|s| s.parse::<i8>().unwrap_or(0)).unwrap_or(0)));
-        }
-        else if cmd == "corner-top-right" {
-            return Behavior::CornerTopRight((params_vec.get(0).map(|s| s.parse::<i8>().unwrap_or(0)).unwrap_or(0), params_vec.get(1).map(|s| s.parse::<i8>().unwrap_or(0)).unwrap_or(0)));
-        }
-        else if cmd == "corner-bottom-left" {
-            return Behavior::CornerBottomLeft((params_vec.get(0).map(|s| s.parse::<i8>().unwrap_or(0)).unwrap_or(0), params_vec.get(1).map(|s| s.parse::<i8>().unwrap_or(0)).unwrap_or(0)));
-        }
-        else if cmd == "corner-bottom-right" {
-            return Behavior::CornerBottomRight((params_vec.get(0).map(|s| s.parse::<i8>().unwrap_or(0)).unwrap_or(0), params_vec.get(1).map(|s| s.parse::<i8>().unwrap_or(0)).unwrap_or(0)));
-        }
-        
-        // worker::console_log!("??????????");
-        Behavior::End
     }
 
     fn reflect_turn_vector(position :&DeltaPosition, turn :Color) -> DeltaPosition {
         if turn == Color::Black {
-            return (-position.0, -position.1);
+            (-position.0, -position.1)
         }
         else {
-            return position.clone();
+            position.clone()
         }
     }
 
@@ -782,31 +722,22 @@ impl<'a> ChessemblyCompiled<'a> {
     fn wall_collision(anchor :&Position, delta :&DeltaPosition, board :&Board, color :Color) -> WallCollision {
         let a0 = (anchor.0 as i8) + delta.0;
         let a1 = (anchor.1 as i8) - delta.1;
-        if a1 < 0 && a0 < 0 {
-            return if color == Color::White { WallCollision::CornerTopLeft } else { WallCollision::CornerBottomRight };
+        match (a0.cmp(&0), a0.cmp(&(board.get_width() as i8)), a1.cmp(&0), a1.cmp(&(board.get_height() as i8))) {
+            (Ordering::Less, _, Ordering::Less, _) => if color == Color::White { WallCollision::CornerTopLeft } else { WallCollision::CornerBottomRight }
+            (_, Ordering::Equal, Ordering::Less, _) => if color == Color::White { WallCollision::CornerTopRight } else { WallCollision::CornerBottomLeft }
+            (_, Ordering::Greater, Ordering::Less, _) => if color == Color::White { WallCollision::CornerTopRight } else { WallCollision::CornerBottomLeft }
+            (Ordering::Less, _, _, Ordering::Equal) => if color == Color::White { WallCollision::CornerBottomLeft } else { WallCollision::CornerTopRight }
+            (Ordering::Less, _, _, Ordering::Greater) => if color == Color::White { WallCollision::CornerBottomLeft } else { WallCollision::CornerTopRight }
+            (_, Ordering::Equal, _, Ordering::Equal) => if color == Color::White { WallCollision::CornerBottomRight } else { WallCollision::CornerTopLeft }
+            (_, Ordering::Greater, _, Ordering::Greater) => if color == Color::White { WallCollision::CornerBottomRight } else { WallCollision::CornerTopLeft }
+            (Ordering::Less, _, _, _) => if color == Color::White { WallCollision::EdgeLeft } else { WallCollision::EdgeRight }
+            (_, Ordering::Equal, _, _) => if color == Color::White { WallCollision::EdgeRight } else { WallCollision::EdgeLeft }
+            (_, Ordering::Greater, _, _) => if color == Color::White { WallCollision::EdgeRight } else { WallCollision::EdgeLeft }
+            (_, _, Ordering::Less, _) => if color == Color::White { WallCollision::EdgeTop } else { WallCollision::EdgeBottom }
+            (_, _, _, Ordering::Equal) => if color == Color::White { WallCollision::EdgeBottom } else { WallCollision::EdgeTop }
+            (_, _, _, Ordering::Greater) => if color == Color::White { WallCollision::EdgeBottom } else { WallCollision::EdgeTop }
+            _ => WallCollision::NoCollision
         }
-        if a1 < 0 && a0 >= (board.get_width() as i8) {
-            return if color == Color::White { WallCollision::CornerTopRight } else { WallCollision::CornerBottomLeft };
-        }
-        if a1 >= (board.get_height() as i8) && a0 < 0 {
-            return if color == Color::White { WallCollision::CornerBottomLeft } else { WallCollision::CornerTopRight };
-        }
-        if a1 >= (board.get_height() as i8) && a0 >= (board.get_width() as i8) {
-            return if color == Color::White { WallCollision::CornerBottomRight } else { WallCollision::CornerTopLeft };
-        }
-        if a0 < 0 {
-            return if color == Color::White { WallCollision::EdgeLeft } else { WallCollision::EdgeRight };
-        }
-        if a0 >= (board.get_width() as i8) {
-            return if color == Color::White { WallCollision::EdgeRight } else { WallCollision::EdgeLeft };
-        }
-        if a1 < 0 {
-            return if color == Color::White { WallCollision::EdgeTop } else { WallCollision::EdgeBottom };
-        }
-        if a1 >= (board.get_height() as i8) {
-            return if color == Color::White { WallCollision::EdgeBottom } else { WallCollision::EdgeTop };
-        }
-        WallCollision::NoCollision
     }
 
     fn move_anchor(anchor :&mut Position, delta :&DeltaPosition, board :&Board, color :Color) -> WallCollision {
@@ -1380,7 +1311,7 @@ impl<'a> ChessemblyCompiled<'a> {
                 };
             }
         }
-        return Ok(nodes);
+        Ok(nodes)
     }
 
     pub fn filter_nodes(&self, nodes :Vec<ChessMove<'a>>, board :&Board<'a>) -> Vec<ChessMove<'a>> {
@@ -1408,85 +1339,87 @@ impl<'a> ChessemblyCompiled<'a> {
         }
 
         let piece_on = board.piece_on(position);
-        if let Some(piece) = piece_on {
-            // worker::console_log!("{}", piece);
-            if piece == "pawn" {
+        let Some(piece) = piece_on else {
+            return Vec::new()
+        };
+        // worker::console_log!("{}", piece);
+        match piece {
+            "pawn" => {
                 let ret = self.generate_pawn_moves(board, position);
                 board.dp.insert((position.0, position.1), ret.clone());
-                return ret;
+                ret
             }
-            else if piece == "king" {
+            "king" => {
                 let danger_zones = if check_danger { MoveGen::get_danger_zones(board, board.color_on(position).unwrap().invert()) } else { Vec::new() };
                 let ret = self.generate_king_moves(board, position, &danger_zones);
                 board.dp.insert((position.0, position.1), ret.clone());
-                return ret;
+                ret
             }
-            else if piece == "rook" {
+            "rook" => {
                 let ret = self.generate_rook_moves(board, position);
                 board.dp.insert((position.0, position.1), ret.clone());
-                return ret;
+                ret
             }
-            else if piece == "knight" {
+            "knight" => {
                 let ret = self.generate_knight_moves(board, position);
                 board.dp.insert((position.0, position.1), ret.clone());
-                return ret;
+                ret
             }
-            else if piece == "bishop" {
+            "bishop" => {
                 let ret = self.generate_bishop_moves(board, position);
                 board.dp.insert((position.0, position.1), ret.clone());
-                return ret;
+                ret
             }
-            else if piece == "queen" {
+            "queen" => {
                 let ret = self.generate_queen_moves(board, position);
                 board.dp.insert((position.0, position.1), ret.clone());
-                return ret;
+                ret
             }
-            else if piece == "tempest-rook" {
+            "tempest-rook" => {
                 let ret = self.generate_tempest_rook_moves(board, position);
                 board.dp.insert((position.0, position.1), ret.clone());
-                return ret;
+                ret
             }
-            else if piece == "bouncing-bishop" {
+            "bouncing-bishop" => {
                 let ret = self.generate_bouncing_bishop_moves(board, position);
                 board.dp.insert((position.0, position.1), ret.clone());
-                return ret;
+                ret
             }
-            else if piece == "dozer" {
+            "dozer" => {
                 let ret = self.generate_dozer_moves(board, position);
                 board.dp.insert((position.0, position.1), ret.clone());
-                return ret;
+                ret
             }
-            else if piece == "alfil" {
+            "alfil" => {
                 let ret = self.generate_alfil_moves(board, position);
                 board.dp.insert((position.0, position.1), ret.clone());
-                return ret;
+                ret
             }
-            else if piece == "bard" {
+            "bard" => {
                 let ret = self.generate_bard_moves(board, position);
                 board.dp.insert((position.0, position.1), ret.clone());
-                return ret;
+                ret
             }
-            else if piece == "zebra" {
+            "zebra" => {
                 let ret = self.generate_ij_moves(board, position, 3, 2);
                 board.dp.insert((position.0, position.1), ret.clone());
-                return ret;
+                ret
             }
-            else if piece == "giraffe" {
+            "giraffe" => {
                 let ret = self.generate_ij_moves(board, position, 4, 1);
                 board.dp.insert((position.0, position.1), ret.clone());
-                return ret;
+                ret
             }
-            else if piece == "camel" {
+            "camel" => {
                 let ret = self.generate_ij_moves(board, position, 3, 1);
                 board.dp.insert((position.0, position.1), ret.clone());
-                return ret;
+                ret
             }
-            else {
+            _ => {
                 let ret = self.generate_moves(board, position, check_danger);
                 board.dp.insert((position.0, position.1), ret.clone().unwrap_or(Vec::new()));
-                return ret.unwrap_or(Vec::new());
+                ret.unwrap_or(Vec::new())
             }
         }
-        Vec::new()
     }
 }
