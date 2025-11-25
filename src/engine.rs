@@ -3,10 +3,10 @@
 // -----------------------------------------------------------------------------
 pub mod game_logic {
     use crate::chessembly;
-    use chessembly::Board;
+    use chessembly::board::Board;
     use chessembly::ChessMove;
     use chessembly::Color;
-    use chessembly::BoardStatus;
+    use chessembly::board::BoardStatus;
     use chessembly::MoveGen;
     // use crate::chess::{self, Board, ChessMove, Color, GameStatus, MoveGen, Piece};
 

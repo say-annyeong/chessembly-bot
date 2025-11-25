@@ -1,6 +1,5 @@
-use crate::chessembly::{Behavior, Board, ChessMove, Color, MoveType, Position, WallCollision};
+use crate::chessembly::{Behavior, board::Board, ChessMove, Color, MoveType, Position, WallCollision};
 use super::ChessemblyCompiled;
-
 
 impl<'a> ChessemblyCompiled<'a> {
     pub fn generate_pawn_moves(&self, board :&mut Board<'a>, position :&Position) -> Vec<ChessMove<'a>> {

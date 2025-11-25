@@ -1,6 +1,6 @@
 use worker::*;
 
-use crate::chessembly::{Board, ChessemblyCompiled};
+use crate::chessembly::{board::Board, ChessemblyCompiled};
 
 pub mod chessembly;
 pub mod engine;
